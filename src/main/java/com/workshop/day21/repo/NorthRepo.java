@@ -37,5 +37,26 @@ public class NorthRepo {
         return customerList;
     }
 
+    public List<Customer> getCustomers(Integer offset, Integer limit) {
+        final List<Customer> customerList = new LinkedList<>();
+
+        // SELECT * FROM customers LIMIT <offset>, <limit>;
+        final SqlRowSet rs = jdbcTemplate.queryForRowSet(LIMIT_SQL, offset, limit);
+
+        // while rs has next line, extract info from columns, to create object
+        while (rs.next()) {
+            Customer c = new Customer();
+            c.setId(rs.getInt("id"));
+            c.setCompany(rs.getString("company"));
+            c.setFirstName(rs.getString("first_name"));
+            c.setLastName(rs.getString("last_name"));
+            c.setJobTitle(rs.getString("job_title"));
+
+            customerList.add(c);
+        }
+
+        return customerList;
+    }
+
     
 }
