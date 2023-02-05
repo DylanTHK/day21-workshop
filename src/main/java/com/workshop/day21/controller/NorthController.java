@@ -1,5 +1,6 @@
 package com.workshop.day21.controller;
 
+import java.text.ParseException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.workshop.day21.model.Customer;
+import com.workshop.day21.model.Order;
 import com.workshop.day21.repo.NorthRepo;
 
 
@@ -23,7 +25,8 @@ public class NorthController {
     NorthRepo northRepo;
 
     // handler method for retrieving ALL customers
-    @GetMapping("/allcustomers")
+    @GetMapping(path="/allcustomers", 
+        consumes="application/json")
     public ResponseEntity<List<Customer>> getAllCustomers() {
         
         List<Customer> queryResult = northRepo.getAllCustomers();
@@ -38,8 +41,8 @@ public class NorthController {
 
     // method to get subset of customers
     @GetMapping("/customers")
-    public ResponseEntity<List<Customer>> getCustomers(@RequestParam("offset") Integer offset, 
-    @RequestParam("limit") Integer limit) {
+    public ResponseEntity<List<Customer>> getCustomers(@RequestParam(value="offset", required=false, defaultValue="0") Integer offset, 
+    @RequestParam(value="limit", required=false, defaultValue="5") Integer limit) {
         List<Customer> queryResult = northRepo.getCustomers(offset, limit);
 
         if (queryResult.isEmpty()) {
@@ -47,7 +50,34 @@ public class NorthController {
         } else {
             return new ResponseEntity<List<Customer>>(queryResult, HttpStatus.OK);
         }
+    }
 
+    // method to return a single customer by id
+    @GetMapping("/customer/{id}")
+    public ResponseEntity<Customer> getCustomerById(@PathVariable Integer id) {
+        System.out.println("ID : " + id);
+        // call method from repo class to return customer
+        Customer c = northRepo.getCustomer(id);
+
+        if (null != c) {
+            return new ResponseEntity<Customer>(c, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    // method to retrieve all orders for given id
+    @GetMapping("customer/{id}/orders")
+    public ResponseEntity<List<Order>> getCustomerOrder(@PathVariable Integer id) throws ParseException {
+
+        // call method from repo, send id into query
+        List<Order> customerOrders = northRepo.getCustomerOrders(id);
+
+        if (customerOrders.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } else {
+            return new ResponseEntity<>(customerOrders, HttpStatus.OK);
+        }
     }
 
 

@@ -12,4 +12,9 @@ public class Query {
                 FROM customers
                 LIMIT ?, ?;""";
 
+    // "SELECT * FROM customers WHERE id = <id>"
+    public static final String GET_BY_ID_SQL = "SELECT * FROM customers WHERE id = ?";
+
+    // SELECT * FROM orders WHERE customer_id = <id>;
+    public static final String GET_ORDERS_BY_ID_SQL = "SELECT * FROM orders WHERE customer_id = ?";
 }
